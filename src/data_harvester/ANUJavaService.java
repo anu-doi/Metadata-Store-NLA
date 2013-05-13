@@ -1,15 +1,38 @@
+/*******************************************************************************
+ * Australian National University Metadata Store
+ * Copyright (C) 2013  The Australian National University
+ * 
+ * This file is part of Australian National University Metadata Store.
+ * 
+ * Australian National University Metadatastore is free software: you
+ * can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+
 /*
-Created by Irwan Krisna, Research Service Division, Australian National University
-ANDS -Funded Project
+ Australian National University Metadata Store
 
-The Java Program to harvest people information from the ANU Java Service and Populate the data into the backend MySQL database.
-It also check whether the people data already exist in the database and then updates the information accordingly from the service. 
-
-Last Updated: 05-March-2013
-
-*/
-
+A Java Program to harvest people information from the ANU Java Service and Populate the data into the backend MySQL database.
+It also check whether the people data already exist in the database and then updates the information accordingly from the service.
  
+ Version 	Date		Developer
+ 1.0        30-04-2013      Irwan Krisna  (IK) Initial 
+
+
+*/ 
+
+
+// Importing various Java and SQL libraries   
 import java.io.*;
 import java.net.URL;
 import java.util.*;
@@ -21,7 +44,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
 
-
+// Importing Java XML parser related libraries
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -34,6 +57,7 @@ import org.w3c.dom.NamedNodeMap;
 
 public class ANUJavaService {
 	
+  // declare public variables
 	public static String StaffUnivID;
 	public static String StaffAriesID;
 	public static String StaffDeidentifiedAriesID;
@@ -41,6 +65,7 @@ public class ANUJavaService {
 	public static int countfor;
 	public static int countforpercentage;
 
+  // initialize constructor
 	public ANUJavaService (int a){
 		int x = a;
 	}
@@ -62,18 +87,15 @@ public class ANUJavaService {
 	public static int intfor2_pct;
 	public static int intfor3_pct;
 	public static String For[] =  new String[2];
-	public static int intForPercent[] =  new int[2];
-	
-	
-		
+	public static int intForPercent[] =  new int[2];	
 	public static String nlaID;
 	public static String uID;
 	
 	
-	
+	// a method to set the current date 
 	public String  showDate(){
 		Locale currentLocale = new Locale("EN");
-		Date today; // declaring the variable "today"
+		Date today; 
 		String dateOut;
 		DateFormat dateFormatter;
 		dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, currentLocale);
@@ -84,34 +106,27 @@ public class ANUJavaService {
 	
 	
 	
-           
+  // read the XML returned data from the Java Service          
 	public void interrogateWebsite(ANUJavaService f){
 	
 		     String dateNow = f.showDate();
-		        
 		     // Begin interrogating the website:
 		     String strTemp = "";
 		     String str1 = "/home/irwan/NLA-XML-Response";
-		    
 		     String str3 = ".xml";
-		 	
 		     String xmlOutput = "test.output";
-	  	
-				   
+	
 				try {  
 	   
 					File file = new File(xmlOutput);
-						
 					DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 					DocumentBuilder db = dbf.newDocumentBuilder();
 					Document doc = db.parse(file);
 					doc.getDocumentElement().normalize();
-					//System.out.println("Root element " + doc.getDocumentElement().getNodeName());
 					
 					if (doc.hasChildNodes()) {
 						printNote(doc.getChildNodes());
-					}
-					//System.out.println(StaffAriesID + " " + fullname + " " + givenname + " "+ surname + " "+ StaffUnivID + " " +for1 + " " +for2 + " " +for1_pct + " " +for2_pct + " " +orgunit + " " +emailAddress + " " + jobtitle);
+					}					
 					
 				}
 				catch (Exception e) {
@@ -119,12 +134,9 @@ public class ANUJavaService {
 				}
 				
 
-	} // End Interrogate website
+	} // End Interrogate website 
 	
-	
-	// the getMySQL should extract all the relevant data 
-	
-	
+	// parse the XML returned data from the Java Service        
 	public static void printNote(NodeList nodeList){
 	
 	
@@ -139,12 +151,11 @@ public class ANUJavaService {
 					NamedNodeMap nodeMap = tempNode.getAttributes();
 					for (int i = 0; i < nodeMap.getLength(); i++) {
 						Node node = nodeMap.item(i);
-						//System.out.println("attr name : " + node.getNodeName());
-						//System.out.println("attr value : " + node.getNodeValue());
+						
 					}
 				}
 				
-				//System.out.println( tempNode.getNodeName() + ":" +tempNode.getTextContent());				
+				
 				// set variables:
 				
 				if(tempNode.getNodeName() == "aries-id"){
@@ -216,7 +227,7 @@ public class ANUJavaService {
 			     
 	
 	}	
-	
+	// get the person data from the MySQL database. To check if the person record already exist in the database. 
 	public void getMySQL(String personID)  {
 		Connection con = null;
 		Statement stmt = null;
@@ -226,9 +237,9 @@ public class ANUJavaService {
 	
 		try {
 			Class.forName("com.mysql.jdbc.Driver") ;
-			//System.out.println("MySQL JDBC driver loaded ok.");
+			
 			con = DriverManager.getConnection("jdbc:mysql://localhost/oaidb?"+ "user=irwan");
-			//System.out.println("MySQL Access ok.");
+			
 			stmt = con.createStatement();
 		
 			rs = stmt.executeQuery("select staffnumber from useraccount where staffnumber = "  + "'" + personID +"'" + " ");
@@ -240,8 +251,6 @@ public class ANUJavaService {
 		
 				countrecords++;
 				
-		
-				
 			}
 			
 			countRecord = countrecords;
@@ -250,14 +259,14 @@ public class ANUJavaService {
 			
 		
 			
-			//System.out.println("Connected with host:port/database.");
+			
 			con.close();
 		}
 		catch (Exception e) {
 			System.err.println("Exception: "+e.getMessage());
 		}
 		
-		//urlprocessed = url;
+		
 		
 	
 		
@@ -278,25 +287,19 @@ public class ANUJavaService {
 	
 	
 	
-	
+	// insert the  person data into the MySQL database
 	public void insertMySQL (String StaffAriesID, String personID, String emailAdd, String givenName, String surName, String organizationUnit, String for1, String for2, String for3, String for1_pct, String for2_pct, String for3_pct, String jobtitle) {
 		Connection conn = null;
 		Statement stmt = null;
 		System.out.println(intfor1_pct +  intfor2_pct +  intfor3_pct);
-	
-		
-		//System.out.println("MySQL JDBC driver loaded ok."); 
-		
 		StaffDeidentifiedAriesID = "I".concat(StaffAriesID);
-		//System.out.println("MySQL Access ok.");
 		String address_updated = organizationUnit.concat(", ANU");
-		
 		PreparedStatement preparedStatement = null;
 		
 		try{
-	 		//System.out.println("MySQL Access TESTTT.");	
+	 			
 			Class.forName("com.mysql.jdbc.Driver") ;
-			//System.out.println("MySQL Access AFTER.");
+			
 			conn = DriverManager.getConnection("jdbc:mysql://localhost/oaidb?"+ "user=irwan");
 			try {
 				stmt = conn.createStatement();
@@ -317,9 +320,9 @@ public class ANUJavaService {
 				preparedStatement.setString(13, jobtitle);
 				preparedStatement.setString(14, StaffDeidentifiedAriesID);
 				
-				//preparedStatement.setString(2, personID);
+				
 				preparedStatement.executeUpdate();	
-				//conn.close();
+				
 			}
 		
 			catch (SQLException s){
@@ -335,14 +338,14 @@ public class ANUJavaService {
 			
 	
 	
-	
+	// update the  person data into the MySQL database. If the person record exists already. 
 	public void updateMySQL (String personID, String orgunit, String email, String jobtitle)  {
-		Connection conn = null;
-                Statement statement = null;
-                PreparedStatement preparedStatement = null;
-                ResultSet resultSet = null;   
-                try {
-                	Class.forName("com.mysql.jdbc.Driver") ;
+		  Connection conn = null;
+      Statement statement = null;
+      PreparedStatement preparedStatement = null;
+      ResultSet resultSet = null;   
+      try {
+               	Class.forName("com.mysql.jdbc.Driver") ;
 			conn = DriverManager.getConnection("jdbc:mysql://localhost/oaidb?"+ "user=irwan");
 			String address_updated = orgunit.concat(", ANU");
 			preparedStatement = conn.prepareStatement("update useraccount set address = ? , email = ?, job_title = ? where staffnumber = ? ");
@@ -382,20 +385,19 @@ public class ANUJavaService {
 	
 	public static void main(String [] args) {		
 		
-		// To create an object Harvest
-		String StaffUniversityID = args[0];		
+		// set the university id of the person record
+		String StaffUniversityID = args[0];
+    
+    // create anujavaservice object		
 		ANUJavaService anujavaservice = new ANUJavaService(1);	
 		
-		// value given in the wget command on the unix script	
+		// read the XML returned data from the Java Service	
 		anujavaservice.interrogateWebsite(new ANUJavaService(1));
-		
 		
 		// get the value from the MySQL & check if the record already there: 
 		anujavaservice.getMySQL(StaffUniversityID);
-	
-		                                
 		
-		// Check if the record already in the database
+		// Check if the person record already exist in the database. If the record does not exist then insert into the database. Otherwise, update the existing information.
 		if(countRecord > 0){
 			System.out.println("The record already exist---");		
 			anujavaservice.updateMySQL(StaffUniversityID,orgunit,emailAddress,jobtitle);

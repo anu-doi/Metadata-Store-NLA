@@ -1,16 +1,42 @@
+/*******************************************************************************
+ * Australian National University Metadata Store
+ * Copyright (C) 2013  The Australian National University
+ * 
+ * This file is part of Australian National University Metadata Store.
+ * 
+ * Australian National University Metadatastore is free software: you
+ * can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+
 /*
-Created by : Irwan Krisna, Research Service Division, Australian National University
-ANDS-Funded Project
-This Java program harvests Publications data from the Java Service and updates the information in the backend. 
+ Australian National University Metadata Store
 
-Last Updated: 05--March-2013
-
-*/
-
-
-
-
+A Java program harvests Publications data from the Java Service and updates the information in the backend. 
  
+ Version 	Date		Developer
+ 1.0        30-04-2013      Irwan Krisna  (IK) Initial 
+
+
+*/ 
+
+
+
+
+
+
+
+ // Importing various Java and SQL libraries   
 import java.io.*;
 import java.net.URL;
 import java.util.*;
@@ -22,7 +48,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
 
-
+// Importing Java XML parser related libraries
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -35,24 +61,18 @@ import org.w3c.dom.NamedNodeMap;
 
 public class ANUJavaServiceGrants {
 	
+  // declare public variables
 	public static String StaffUnivID;
 	public static String StaffAriesID;
 	public static String grant_ariesID;
 	public static int countRecord = 0;
 	public static String fileOutput;
-
-	
 	public static String xmlstatus;
-
+  // initialize constructor
 	public ANUJavaServiceGrants (int a){
 		int x = a;
-	}
-
-	//public static String category;		
+	}		
 	public static String grant_title;
-	//public static String source_name;
-	//public static String source_id;
-	//public static String pub_year;
 	public static String first_investigator_givenname;
 	public static String first_investigator_surname;
 	public static String reference_number;
@@ -62,27 +82,18 @@ public class ANUJavaServiceGrants {
 	public static String for1;
 	public static String for2;
 	public static String for3;
-        public static String for1_pct;
-        public static String for2_pct;
-        public static String for3_pct;
-        public static int countfor=0;
-        public static int countforpercentage=0;  
-        public static String For[] =  new String[2];
-        public static int intForPercent[] =  new int[2];
-	
-	
-	//public static String nlaID;
-	
-	
-	// to get the detail of a person:
-	//public static String [][][][]personDetail ;
-
-	
-	//public static String nlaID;
-	//public static String uID;
+  public static String for1_pct;
+  public static String for2_pct;
+  public static String for3_pct;
+  public static int countfor=0;
+  public static int countforpercentage=0;  
+  public static String For[] =  new String[2];
+  public static int intForPercent[] =  new int[2];
 	
 	
 	
+	
+	 // a method to set the current date 
 	public String  showDate(){
 		Locale currentLocale = new Locale("EN");
 		Date today; // declaring the variable "today"
@@ -96,26 +107,21 @@ public class ANUJavaServiceGrants {
 	
 	
 	
-           
+  // read the XML returned data from the Java Service                
 	public void interrogateWebsite(ANUJavaServiceGrants f){
-	 	     // Step 1: interrogate the website : Based on the number of web pages
-		     //int loopCountCopy = Integer.parseInt(loopCount);
-		     String dateNow = f.showDate();							        
-		        
+	 	     
+		     String dateNow = f.showDate();							           
 		     // Begin interrogating the website:
 		     String strTemp = "";
 		     String str1 = "/home/irwan/NLA-XML-Response";
-		    
 		     String str3 = ".xml";
-		 	
 		     String xmlOutput = "grants.output";
 
     	
 				   
 				try {  
 	   
-					File file = new File(xmlOutput);
-						
+					File file = new File(xmlOutput);						
 					DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 					DocumentBuilder db = dbf.newDocumentBuilder();
 					Document doc = db.parse(file);
@@ -125,8 +131,6 @@ public class ANUJavaServiceGrants {
 					if (doc.hasChildNodes()) {
 						NodeList nodeLst = doc.getElementsByTagName("grants");
 						printNote(doc.getChildNodes());
-
-						//System.out.println("PUBS  " + pub_ariesID + " " + category + " " + pub_title + " " + for1 + " " +for2 );
 					
 						
 					}
@@ -142,12 +146,9 @@ public class ANUJavaServiceGrants {
 				
 
 	} // End Interrogate website
+ 
 	
-	
-	
-	// the getMySQL should extract all the relevant data 
-	
-	
+	  // parse the XML returned data from the Java Service
 	public static void printNote(NodeList nodeList){
 		
 		for (int count = 0; count < nodeList.getLength(); count++) {
@@ -181,12 +182,6 @@ public class ANUJavaServiceGrants {
 				else if (tempNode.getNodeName() == "funds-provider"){
 					funds_provider = tempNode.getTextContent();
 				}
-				/*
-				else if (tempNode.getNodeName() == "publication-year"){
-					pub_year = tempNode.getTextContent();
-					
-				}
-				*/
 			
 							
 				
@@ -213,7 +208,7 @@ public class ANUJavaServiceGrants {
 				}
 				
 				if(tempNode.getNodeName()== "code"){
-					//System.out.println("TESTCODE: " + tempNode.getTextContent() + " " + countfor);
+					
 					if(countfor==0){
 						for1 =  tempNode.getTextContent();
 						
@@ -231,7 +226,6 @@ public class ANUJavaServiceGrants {
 				}
 				
 				
-				//System.out.println("WOW " + xmlstatus);
 				if(tempNode.getNodeName()== "grant"){
 					grant_ariesID = null;
 					grant_title=null;
@@ -247,8 +241,7 @@ public class ANUJavaServiceGrants {
 				}	
 						
 				if(grant_title != null && grant_ariesID != null && for1 != null &&  for1_pct != null ){
-					//getMySQL(pub_ariesID);
-					//System.out.println("TEST " + pub_ariesID);
+					
 					try {
 						String fileOutputDir = "/home/irwan/NLA-Harvester-Dev";
 						fileOutput = "GRANTS".concat(".txt");
@@ -270,6 +263,8 @@ public class ANUJavaServiceGrants {
 	
 	}	
 	
+  
+  // get the person data from the MySQL database. To check if the person record already exist in the database. 
 	public static void getPersonIDMySQL(String StaffUniversityID)  {	
 		Connection con = null;
 		Statement stmt = null;
@@ -277,12 +272,10 @@ public class ANUJavaServiceGrants {
 		PreparedStatement preparedStatement = null;
 		try {
 			Class.forName("com.mysql.jdbc.Driver") ;
-			//System.out.println("MySQL JDBC driver loaded ok.");
 			con = DriverManager.getConnection("jdbc:mysql://localhost/oaidb?"+ "user=irwan");
-			//System.out.println("MySQL Access ok.");
 			stmt = con.createStatement();
  			rs = stmt.executeQuery("select id_org from useraccount where staffnumber = "  + "'" + StaffUniversityID +"'" + " ");
-			//System.out.println("MySQL Query ok.");
+			
 			while (rs.next()) {
 				
 				StaffAriesID = rs.getString(1);
@@ -308,7 +301,7 @@ public class ANUJavaServiceGrants {
 		                                        
 	
 	}
-	
+	// get the grant record from the MySQL database. To check if the grant record already exist in the database. 
 	public static void getMySQL(String grant_ariesID)  {
 		Connection con = null;
 		Statement stmt = null;
@@ -318,21 +311,15 @@ public class ANUJavaServiceGrants {
 	
 		try {
 			Class.forName("com.mysql.jdbc.Driver") ;
-			//System.out.println("MySQL JDBC driver loaded ok.");
 			con = DriverManager.getConnection("jdbc:mysql://localhost/oaidb?"+ "user=irwan");
-			//System.out.println("MySQL Access ok.");
 			stmt = con.createStatement();
 			rs = stmt.executeQuery("select ariesgrantid from grant_detail where ariesgrantid = "  + "'" + grant_ariesID +"'" + " ");
-			//System.out.println("MySQL Query ok.");
+			
 			int countrecords = 0;
 			
 			while (rs.next()) {
 				String pubID = rs.getString(1);
 				countrecords++;
-				
-							
-				
-				
 			}
 			
 			countRecord = countrecords;
@@ -340,11 +327,6 @@ public class ANUJavaServiceGrants {
 			if(countRecord > 0){
 				System.out.println("Exist Already");
 			}
-			
-		
-			
-			//System.out.println("Connected with host:port/database.");
-			
 			con.close();
 		}
 		catch (Exception e) {
@@ -362,39 +344,23 @@ public class ANUJavaServiceGrants {
 				stmt = null;
 			}
 		}// end finally	
-		
-				                
-		
-			
-	
+
 	}
-	
+	// insert a  grant record into the MySQL database
   public  static void  insertMySQL (String grant_ariesID, String grant_title, String StaffUniversityID,String for1, String for2, String for3, String for1_pct,String for2_pct,String for3_pct,String funds_provider) {
 		Connection conn = null;
-
 		Statement stmt = null;
-	
-	
-
-		//System.out.println("MySQL JDBC driver loaded ok."); 
-
-		//System.out.println("MySQL Access ok.");
-
 		PreparedStatement preparedStatement = null;
 
 
-
 		try{
-	 		//System.out.println("MySQL Access TESTTT.");	
+	 			
 			Class.forName("com.mysql.jdbc.Driver") ;
-			//System.out.println("MySQL Access AFTER.");
 			conn = DriverManager.getConnection("jdbc:mysql://localhost/oaidb?"+ "user=irwan");
 			try {
 				pKey = grant_ariesID.concat("XXX").concat(StaffUniversityID); 
-				stmt = conn.createStatement();
-				//System.out.println("Mine: "+ grant_ariesID);
+				stmt = conn.createStatement();				
 				preparedStatement = conn.prepareStatement("insert into  grant_detail (pkey,ariesgrantid,grant_title,staffid,for1,for2,for3,for1_pct,for2_pct,for3_pct,funds_provider) values (?,?,?,?,?,?,?,?,?,?,?)");
-				//System.out.println("1 row affected");
 				preparedStatement.setString(1, pKey);	
 				preparedStatement.setString(2, grant_ariesID);
 				preparedStatement.setString(3, grant_title);
@@ -406,17 +372,12 @@ public class ANUJavaServiceGrants {
 				preparedStatement.setString(9, for2_pct);
 				preparedStatement.setString(10, for3_pct);
 				preparedStatement.setString(11,funds_provider );
-				
-				
-				
-	
-				//preparedStatement.setString(2, personID);
 				preparedStatement.executeUpdate();	
-				//conn.close();
+				
 			}
 		
 			catch (SQLException s){
-				//System.out.println("SQL statement is not executed!");
+				
 				System.out.println(s);
 			}
 		}
@@ -432,31 +393,31 @@ public class ANUJavaServiceGrants {
 	
 	public static void main(String [] args) {		
 		
-		// To create an object Harvest
-		String StaffUniversityID = args[0];		
+		// set the university id of the grant's investigator 
+		String StaffUniversityID = args[0];	
+    
+    // create ANUJavaServiceGrants object			
 		ANUJavaServiceGrants anujavaservicegrants = new ANUJavaServiceGrants(1);	
 		
-		// value given in the wget command on the unix script	
+		// read the XML returned data from the Java Service		
 		anujavaservicegrants.interrogateWebsite(new ANUJavaServiceGrants(1));
 		
 		System.out.println(grant_ariesID);			
-		// get the value from the MySQL & check if the record already there: 
+		// get the grant record from the MySQL & check if the record already there:  
  		anujavaservicegrants.getMySQL(grant_ariesID);
 		
 		
-		
+		// get the investigator record in the database. check if the record is there. 
 		anujavaservicegrants.getPersonIDMySQL(StaffUniversityID);
 	
-		// read from a file:
+		// Grant records insertion: If the record does not exist then insert into the database.
 		try{
 			FileInputStream fstream = new FileInputStream("GRANTS.txt");
 			DataInputStream in = new DataInputStream(fstream);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			String strLine;
-			//System.out.println("MY ID" + StaffAriesID);
 			
 			while ((strLine = br.readLine()) != null)   {
-				//System.out.println (strLine);
 				String parts[] = strLine.split("\t");
 				System.out.println (parts[0] + "\n");
 				anujavaservicegrants.insertMySQL(parts[0],parts[1],StaffUniversityID,parts[3],parts[4],parts[5],parts[6],parts[7],parts[8],parts[9]);
@@ -467,20 +428,7 @@ public class ANUJavaServiceGrants {
 		
 			System.err.println("Error: " + e.getMessage());
 		}
-			
-			
-			
-		// Delete the PUBS.txt file
-		//boolean success = (new File(fileOutput)).delete();
-		
-  		
-		//System.out.println(countRecord);
 	
-		
-		
-		
-	
-  
 	}
 }
 

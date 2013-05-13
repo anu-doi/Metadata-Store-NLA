@@ -1,18 +1,40 @@
+/*******************************************************************************
+ * Australian National University Metadata Store
+ * Copyright (C) 2013  The Australian National University
+ * 
+ * This file is part of Australian National University Metadata Store.
+ * 
+ * Australian National University Metadatastore is free software: you
+ * can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 
 /*
-Created by: Irwan Krisna, Research Service Division, Australian National University
-ANDS-Funded-Project
+ Australian National University Metadata Store
 
-This java program to harvest the NLA ID contributed by the ANU from the Trove Database. 
+ A java program to harvest the NLA ID contributed by the ANU from the Trove Database. 
 It also automatically update the NLA-ID into the database.
-
-Last Updated: 05-March-2013
-
-
-*/
-
-
  
+ Version 	Date		Developer
+ 1.0        30-04-2013      Irwan Krisna  (IK) Initial 
+
+
+*/ 
+
+
+
+
+// Importing various Java and SQL libraries    
 import java.io.*;
 import java.net.URL;
 import java.util.*;
@@ -24,7 +46,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
 
-
+// Importing Java XML parser related libraries
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -50,7 +72,7 @@ public class NLAIDHarvester {
 	// to get the detail of a person:
 	public static String [][][][]personDetail ;
 	
-	
+	// a method to set the current date 
 	public String  showDate(){
 		Locale currentLocale = new Locale("EN");
 		Date today; // declaring the variable "today"
@@ -61,43 +83,14 @@ public class NLAIDHarvester {
 		dateOut = dateFormatter.format(today);  
 		return dateOut;
 	}
-	/*
-	public String showNLAID(){
-		String error = "err";
-		try {
-		      FileInputStream fstream = new FileInputStream("c:\\WorkSpace\\ANDS\\SChema\\OutputFinal-Sep 21, 2012.txt");
-		      DataInputStream in = new DataInputStream(fstream);
-		      BufferedReader br = new BufferedReader(new InputStreamReader(in));
-		      String str ;
-		      
-		      //String error = "err";
-		      while ((str = br.readLine()) != null) {
-		        return str;
-		      }
-		      in.close();
-		    } catch (Exception e) {
-		    	return error;
-		      //System.err.println(e);
-		    }
-	}
-	*/
-   
-	public void interrogateWebsite(String surname, String personID, NLAHarvesterIKModified f ){
-		// Step 1: interrogate the website : Based on the number of web pages
-		     //int loopCountCopy = Integer.parseInt(loopCount);
-		     String dateNow = f.showDate();
 	
-
-		     //String surname = "hanigan";
-		     //String personID = "I10691";			
-		        
-		        
-		     // Begin interrogating the website:
+   // read the XML returned data from the Trove application   
+	public void interrogateWebsite(String surname, String personID, NLAHarvesterIKModified f ){
+	     	
+		     String dateNow = f.showDate();    
 		     String strTemp = "";
 		     String str1 = "/home/irwan/NLA-XML-Response";
-		    
 		     String str3 = ".xml";
-		 	
 		     String xmlOutput = str1.concat(str3);
 		 			
 				try {
@@ -109,24 +102,18 @@ public class NLAIDHarvester {
 					System.out.println("sruQuery: "  + sruQuery);
 					BufferedReader br = new BufferedReader(new InputStreamReader(my_url.openStream()));
 					while(null != (strTemp = br.readLine())){
-	            
-	        	 	  
+
 						FileWriter fstream = new FileWriter(xmlOutput,true);
 						BufferedWriter out = new BufferedWriter(fstream);
 						out.write(strTemp); 
 						out.close();
-	                                  
-	            
-	            
+	
 					} // END WHILE
 				}// END TRY
 				catch (Exception ex) {
 					ex.printStackTrace();
 				}
-			
-	
-    	
-	    
+
 				try {  
 	   
 					File file = new File(xmlOutput);
@@ -136,7 +123,7 @@ public class NLAIDHarvester {
 					doc.getDocumentElement().normalize();
 					System.out.println("Root element " + doc.getDocumentElement().getNodeName());
 					NodeList nodeLst = doc.getElementsByTagName("record");
-					//System.out.println("Information of National Library");
+				
 					String st;
 					for (int s = 0; s < nodeLst.getLength(); s++) {
 						Node fstNode = nodeLst.item(s);
@@ -150,13 +137,10 @@ public class NLAIDHarvester {
   
 							st = ((Node) fullNm.item(0)).getNodeValue();
 							st = st.replace("\n", "");
-							//System.out.println("name : "  + st);
-  
-  
+
 							NodeList ElmntLst = fstElmnt.getElementsByTagName("identifier");
 							Element lstNmElmnt = (Element) ElmntLst.item(0);
 							NodeList lstNm = lstNmElmnt.getChildNodes();
-							//System.out.println("identifier : " + ((Node) lstNm.item(0)).getNodeValue());
 		   
 							NodeList ElmntDesc = fstElmnt.getElementsByTagName("description");
 							Element DescElmnt = (Element) ElmntDesc.item(0);
@@ -184,13 +168,7 @@ public class NLAIDHarvester {
 							}
 							catch (IOException e){
 			   
-							}
-		   
-			
-  
-		   
-
-							// DELETE THE XML FILE:c:\\WorkSpace\\ANDS\\SChema\\NLA-XML-Response.xml     
+							} 
   
 						} // END IF 
 	   
@@ -230,24 +208,14 @@ public class NLAIDHarvester {
 				System.out.println(" First Name = " + firstname);
 				System.out.println(" Family Name = " + surname);
 				System.out.println(" url = " + url);
-				
-				
+
 			}
-		
-			
-			//System.out.println("Connected with host:port/database.");
 			con.close();
 		}
 		catch (Exception e) {
 			System.err.println("Exception: "+e.getMessage());
 		}
-		
-		//urlprocessed = url;
-		
 	
-		
-		
-		
 		finally {
 			if (rs != null) {
 				try  {
@@ -258,11 +226,7 @@ public class NLAIDHarvester {
 				stmt = null;
 			}
 		}// end finally	
-		
-		//System.out.println(url);			                
-		
-			
-	
+
 	}
 	
 	public void updateMySQL (String personID, String nlaID)  {
@@ -275,28 +239,11 @@ public class NLAIDHarvester {
 			Class.forName("com.mysql.jdbc.Driver") ;
 			conn = DriverManager.getConnection("jdbc:mysql://localhost/oaidb?"+ "user=irwan");
 			preparedStatement = conn.prepareStatement("update oai_records set nla_id = ? where ori_id = ? ");
-		
-			
-
-			
-			//System.out.println("MySQL Query ok.");
-			
 			preparedStatement.setString(1, nlaID);
 			preparedStatement.setString(2, personID);
 			preparedStatement.executeUpdate();
 			
-			/*
-			personID = rs.getString(1);
-			firstname = rs.getString(2);
-			surname = rs.getString(3);
-			url = rs.getString(4);
-			System.out.println(" person ID = " + personID);
-			System.out.println(" First Name = " + firstname);
-			System.out.println(" Family Name = " + surname);
-			System.out.println(" url = " + url);
-			System.out.println("Connected with host:port/database.");
-			*/
-			
+		
 			conn.close();
 		}
 		catch (Exception e) {
