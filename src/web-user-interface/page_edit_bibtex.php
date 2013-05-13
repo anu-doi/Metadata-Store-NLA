@@ -1,7 +1,4 @@
-
-
-
-
+<?php session_start(); ?>
 <?php // Page Template version 3.3
 /*******************************************************************************
  * Australian National University Metadata Store
@@ -27,7 +24,7 @@
 /*
  Australian National University Metadata Store
 
- A page to update NLA ID
+ A page that provides a text field  to insert bibtex data 
  
  Version 	Date		Developer
  1.0        30-04-2013      Irwan Krisna  (IK) Initial 
@@ -37,8 +34,8 @@
 
 // PLEASE UPDATE THESE VALUES FOR EVERY PAGE
 // -----------------------------------------------------------------------------
-$title			= 'NLA ID Provisioning';
-$description	= 'National Library of Australia ID Mint';
+$title			= 'Researcher Profile';
+$description	= 'Research Activities';
 $subject		= 'Research, Website';
 
 // Include configuration file & begin the XHTML response
@@ -50,7 +47,7 @@ echo $Head;
 // insert additional header statements here //
 echo $Body;
 echo $Banner; 
-include $Menu3;
+include $Menu5;
 
 
 // BEGIN: Page Content
@@ -73,18 +70,40 @@ include $Menu3;
 	<!--[endif]-->
 </head>
 	
+<script>    
+function confirmproceed()
+{
+  var answer = confirm("Are you sure?");
+  if(answer == true){
+	document.getElementById("MyConfirm").submit();
+  }else {
+  	alert('A wise decision!');
+    return false;
+  }
 	
-
+}
+</script>
 <body>
+
     
+
 <fieldset>
 
 <style>
 #labelx	 
 	{ float:left; width:20em; display:block; clear:left; margin-right:1em; text-align:left;  cursor:hand; }
 </style>    
+        
     
 <?php
+//set_error_handler('myHandlerForMinorErrors', E_NOTICE | E_STRICT);
+// Make a MySQL Connection
+//var_dump(isset($Fname));
+//var_dump(isset($Lname));
+//session_start();
+
+//require_once('index_login_nla.php');
+//session_start();
 
 
 
@@ -95,73 +114,81 @@ if (!$con)
   }
 
 
+
+//pop -up box
+
+
+
 mysql_select_db("oaidb", $con);
 
-
-//get the university ID 
-$deidentified_staffid= $_GET[deidentified_staffid];
-
-//MySQL Query: To get list of people records whose NLA-IDs need to be sent to the Java Service
-$result = mysql_query("SELECT  b.staffnumber staffid,nla_id,first_name,family_name from oai_records a,useraccount b  where nla_id is not null and a.ori_id = b.id_org and b.id_org = '$deidentified_staffid'  ; ") or die('Test Data: ' . mysql_error);
+//if($_POST[UID]!= ""){
+//echo $_SESSION['logged_in'];
+//echo $_SESSION['universityid'];
 
 
-/*
-Result of the MySQL: 
- - List all returned records from the MySQL query above
- - Update the Java Service with the NLA ID information of each researcher 
-*/
+echo $_POST[username],"</br>";
+$uniid= $_SESSION['universityid'];
+//echo $uniid;
+if ($_SESSION['logged_in']){
+	$result = mysql_query("SELECT distinct staffnumber,id_org,title,first_name,family_name,address,email,www,description,tel,fax,for1,for2,for3,job_title FROM useraccount where  staffnumber like '$uniid' ; ") or die('Test Data: ' . mysql_error());	
+}
+else{
+	echo "Please go back to previous page";
+}
+
+if(($result === FALSE)) {
+    die(mysql_error()); // TODO: better error handling
+}
 
 
+
+
+//echo "<br/>";
+//echo "<br/>";
+echo "<html>";
+echo "<body>";
+echo '<form action="page_confirmed_bibtex.php" method="post" onsubmit="return confirm("Are you sure you want to submit?")">';
 while($row = mysql_fetch_array($result)){
-        extract($_POST);
-        $nla_id = $row['nla_id'];
-        if($row['nla_id']!=""){
-          echo $row['first_name']," ",$row['family_name'],"'s NLA ID has been successfully updated!","<br>";
-          echo "<br>";
-          echo "NLA ID: ",$row['nla_id'],"<br>";
-          echo "<br>";
-          
-        }        
-        else{
-          echo "Update Unsuccessful","<br>";
-          
-        }
-        //set POST variables
-        $url = 'http://dc7-dev2.anu.edu.au:9080/services/rest/person/update/'.$row['staffid'];
-        //echo $url;
-        
-        $fields = array(
-        	'nla-id'=>urlencode($nla_id)
-	);
+	echo "<br>";
+	echo "<h1>","<cite>",$row['title'],"</cite>"," ","<cite>",$row['first_name'],"</cite>"," ","<cite>",$row['family_name'],"</cite>","</h1>";
+        echo "Status: ";		
+		echo "<br>";
+        echo "Please insert the Reference List in the BibTex format. ";
+        echo "<br>";
 	
-
-	//url-ify the data for the POST
-	foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
-	rtrim($fields_string,'&');
+	//echo "<img src='Steve_Jobs.jpg' alt='some_text'>","<br/>","<br/>";
+	echo "<br>","<form>";
+	echo "<div id='wrapper'>";
+	echo "<div id='left'>";
+	
+	
+	echo "<br>","BibTex import :","</br>","</br>"; 
+echo "<textarea rows='25' cols='100' name='DescUpdated' wrap='hard'>Enter your BibTex data</textarea>","<br>";
+	
+	
+	echo "</form>";
+	
+    
       
-	//open connection
-	$ch = curl_init();
-	
-	//execute post
-	$result = curl_exec($ch);
-	
 	
 }
-curl_close($ch);
 
 
-        
-        
-			
-//}
-echo "<br>";
-echo "<br>";  
+
+$uid_post = $_SESSION['username'];
+
+echo '<input type="radio" name="pubidnext" value=',$uid_post,' checked="checked", style="visibility:hidden">','<br>';
+echo "<br/>";
+echo '<input id="MyConfirm" onclick="return confirmproceed();" type="Submit" value="Confirm" name="IncludePubs"><br/>';
+
+
+	echo "<br/>";
+
+echo "</body>";
+echo "</html>"; 
+
 
 ?>
-</fieldset>
-</form>
-</body>
-</html>	
 
 <!-- END MAIN PAGE CONTENT -->
 <?php 

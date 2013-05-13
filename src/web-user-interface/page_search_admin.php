@@ -1,4 +1,11 @@
-<?php session_start();
+<?php session_start(); 
+
+
+?>
+
+
+
+<?php // Page Template version 3.3
 
 /*******************************************************************************
  * Australian National University Metadata Store
@@ -24,20 +31,13 @@
 /*
  Australian National University Metadata Store
 
- A page to search a person
+ A page to search for a person  (only for administrator privilege )
  
  Version 	Date		Developer
  1.0        30-04-2013      Irwan Krisna  (IK) Initial 
 
 
-*/  
-
-
-?>
-
-
-
-<?php // Page Template version 3.3
+*/ 
 
 // PLEASE UPDATE THESE VALUES FOR EVERY PAGE
 // -----------------------------------------------------------------------------
@@ -137,7 +137,9 @@ if(($result === FALSE) or ($result2 === FALSE)) {
 echo $_POST[mydropdown];
 $deidentified_staffid= $_GET[deidentified_staffid];
 if ($_SESSION['logged_in']){
-	$result = mysql_query("SELECT distinct a.staffnumber,a.id_org,a.title,a.first_name,a.family_name,a.address,a.email,a.www,a.description,a.tel,a.fax,a.for1,a.for2,a.for3,a.job_title  FROM useraccount a where a.staffnumber like  '%$_POST[univid]%' and  a.first_name like '%$_POST[fname]%' and a.family_name like '%$_POST[lname]%' and a.address like '%$_POST[address]%' and a.id_org like '%$deidentified_staffid%' limit 50 ; ") or die('Test Data: ' . mysql_error());
+	$result = mysql_query("SELECT distinct a.staffnumber,a.id_org,a.title,a.first_name,a.family_name,a.address,a.email,a.www,a.description,a.tel,a.fax,a.for1,a.for2,a.for3,b.nla_id,
+	a.job_title  FROM useraccount a LEFT JOIN oai_records b ON (a.id_org = b.ori_id) where  a.staffnumber like  '%$_POST[univid]%' and  a.first_name like '%$_POST[fname]%' and a.family_name like '%$_POST[lname]%' 
+	and a.address like '%$_POST[address]%' and a.id_org like '%$deidentified_staffid%' limit 50 ; ") or die('Test Data: ' . mysql_error());
 }
 
 else 
@@ -232,7 +234,7 @@ echo "<th>First Name</th>";
 echo "<th>Last Name</th>";
 echo "<th>Address</th>";
 echo "<th>View Profile</th>";
-echo "<th>Provision NLA ID</th>";
+echo "<th>Update NLA ID</th>";
 echo "</tr>";
 //echo '<form action="http://dc7-dev2.anu.edu.au/oai/oai2.php?verb=ListRecords&metadataPrefix=rif" method="post">';
 while($row = mysql_fetch_array($result))
@@ -248,7 +250,13 @@ while($row = mysql_fetch_array($result))
 	echo "<td>",$row['family_name'],"</td>"; 
 	echo "<td>",$row['address'],"</td>"; 
 	echo "<td>","<font size=3>","<a href=\"page_person.php?deidentified_staffid=".$deidentified_staffid."\">","view","</a></font>","</td>";
-	echo "<td>","<font size=3>","<a href=\"page_update_nlaid.php?deidentified_staffid=".$deidentified_staffid."\">","update","</a></font>","</td>";
+	if($row['nla_id']!=""){
+		echo "<td>","<font size=3>","<a href=\"page_update_nlaid.php?deidentified_staffid=".$deidentified_staffid."\">","update","</a></font>","</td>";
+	}
+	else {
+		echo "<td>","<font size=3>","<a>","</a></font>","</td>";
+	
+	}
 	echo "</tr/>";	
   }
 echo "</table>";

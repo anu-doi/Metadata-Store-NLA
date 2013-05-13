@@ -1,4 +1,12 @@
 <?php session_start(); 
+
+
+
+?>
+
+
+
+<?php // Page Template version 3.3
 /*******************************************************************************
  * Australian National University Metadata Store
  * Copyright (C) 2013  The Australian National University
@@ -23,7 +31,7 @@
 /*
  Australian National University Metadata Store
 
- A page to Search a Topic
+ A page to search for a person
  
  Version 	Date		Developer
  1.0        30-04-2013      Irwan Krisna  (IK) Initial 
@@ -31,12 +39,6 @@
 
 */ 
 
-
-?>
-
-
-
-<?php // Page Template version 3.3
 
 // PLEASE UPDATE THESE VALUES FOR EVERY PAGE
 // -----------------------------------------------------------------------------
@@ -135,7 +137,7 @@ if(($result === FALSE) or ($result2 === FALSE)) {
 
 echo $_POST[mydropdown];
 if ($_SESSION['logged_in']){
-	$result = mysql_query("SELECT topic_id,REPLACE(topic_area,' ','-') topic_area,sum(publication_count) count  FROM author_topic where topic_area like '%$_POST[searchkeyword]%' group by topic_id,topic_area order by count desc  limit 20 ; ") or die('Test Data: ' . mysql_error());
+	$result = mysql_query("SELECT distinct a.staffnumber,a.id_org,a.title,a.first_name,a.family_name,a.address,a.email,a.www,a.description,a.tel,a.fax,a.for1,a.for2,a.for3,a.job_title  FROM useraccount a where a.staffnumber like  '%$_POST[univid]%' and  a.first_name like '%$_POST[fname]%' and a.family_name like '%$_POST[lname]%' and a.address like '%$_POST[address]%' limit 50 ; ") or die('Test Data: ' . mysql_error());
 }
 
 else 
@@ -151,7 +153,7 @@ while($row3 = mysql_fetch_array($result3)){
 
 echo "<html>";
 echo "<body>";
-echo '<form action="page_search_topic.php" method="post" >';
+echo '<form action="page_search_admin.php" method="post" >';
 echo "Search Function:";
 echo "<br>";
 echo "<br>";
@@ -159,11 +161,10 @@ echo "<br>";
 //echo "First Name:","<input type='text' name='searchfname' id='searchfname'  maxlength='50' />","</br>";
 //echo "<label id='labelx' name='searchfname'>","First Name:","</label>","<br>";
 
-echo "<label id='labelx' for='searchkeyword'>","Keyword:","</label>",
-"<INPUT TYPE = 'Text' NAME ='searchkeyword' id = 'searchkeyword' size='30'>","<br/>";
+echo "<label id='labelx' for='searchunivid'>","University ID:","</label>",
+"<INPUT TYPE = 'Text' NAME ='univid' id = 'univid' size='30'>","<br/>";
 
 echo "<br>";
-/*
 echo "or","<br>";
 echo "<br>";
 
@@ -196,7 +197,6 @@ echo "<option value='CAP'>College of Asia Pacific</option>";
 echo "<option value='CECS'>College of Engineering and Computer Sciences</option>";
 echo "</select>";
 echo "</div>";
-*/
 
 
 echo "</br>";
@@ -227,9 +227,12 @@ echo "<body>";
 echo "<table border='1'>";
 echo "<tr>";
 //echo "<th>Include ?</th>";
-echo "<th>Topic ID</th>";
-echo "<th>Topic Area</th>";
-echo "<th>View Topic</th>";
+echo "<th>Title</th>";
+echo "<th>First Name</th>";
+echo "<th>Last Name</th>";
+echo "<th>Address</th>";
+echo "<th>View Profile</th>";
+echo "<<th>Update NLA ID</th>";
 echo "</tr>";
 //echo '<form action="http://dc7-dev2.anu.edu.au/oai/oai2.php?verb=ListRecords&metadataPrefix=rif" method="post">';
 while($row = mysql_fetch_array($result))
@@ -237,12 +240,15 @@ while($row = mysql_fetch_array($result))
 
 	
 	//Checkbox = C $row2['pubid'];
-	$topic_id = $row['topic_id'];
+	$deidentified_staffid = $row['id_org'];
 	echo "<tr>";
 	//echo "<td>",'<input type="checkbox" name="pubidcheck[]" value=',$valuetextbox,'>',"</td>";    	
-	echo "<td>",$row['topic_id'],"</td>";
-	echo "<td>",$row['topic_area'],"</td>"; 
-	echo "<td>","<font size=3>","<a href=\"page_topic_specific_result.php?topic_id=".$topic_id."\">","view","</a></font>","</td>";
+	echo "<td>",$row['title'],"</td>";
+	echo "<td>",$row['first_name'],"</td>"; 
+	echo "<td>",$row['family_name'],"</td>"; 
+	echo "<td>",$row['address'],"</td>"; 
+	echo "<td>","<font size=3>","<a href=\"page_person.php?deidentified_staffid=".$deidentified_staffid."\">","view","</a></font>","</td>";
+	echo "<td>","</td>";
 	
 	echo "</tr/>";	
   }

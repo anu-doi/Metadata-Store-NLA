@@ -23,7 +23,7 @@
 /*
  Australian National University Metadata Store
 
- A page describing a person
+ A  page describing a person
  
  Version 	Date		Developer
  1.0        30-04-2013      Irwan Krisna  (IK) Initial 
